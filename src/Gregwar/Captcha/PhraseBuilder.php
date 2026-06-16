@@ -31,9 +31,10 @@ class PhraseBuilder implements PhraseBuilderInterface
         }
 
         $phrase = '';
+        $chars = str_split($this->charset);
 
         for ($i = 0; $i < $this->length; $i++) {
-            $phrase .= $this->getRandomCharacter();
+            $phrase .= $chars[$this->getRandomCharacter()];
         }
 
         return $phrase;
@@ -66,8 +67,13 @@ class PhraseBuilder implements PhraseBuilderInterface
     private function getRandomCharacter(): string
     {
         try {
-            return $this->charset[random_int(0, strlen($this->charset) - 1)];
-        } catch (\Random\RandomException $e) {
+            $length = strlen($this->charset);
+            if ($length === 0) {
+                throw new \ValueError('Charset must not be empty');
+            }
+
+            return $this->charset[random_int(0, $length - 1)];
+        } catch (\Random\RandomException | \ValueError $e) {
             $chars = str_split($this->charset);
 
             return $chars[array_rand($chars)];
